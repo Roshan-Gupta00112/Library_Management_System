@@ -16,7 +16,7 @@ public class StudentController {
     StudentService studentService;
 
     @PostMapping("/add")
-    public String addStudent(@RequestBody StudentRequestDTO studentRequestDTO){
+    public String addStudent(@RequestBody StudentRequestDto studentRequestDTO){
         studentService.addStudent(studentRequestDTO);
 
         return "Student added successfully";

@@ -7,7 +7,6 @@ import com.backendMajorProject.librarymanagementsystem.Enum.CardStatus;
 import com.backendMajorProject.librarymanagementsystem.Repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -17,7 +16,7 @@ public class StudentService {
     @Autowired
     StudentRepository studentRepository;
 
-    public void addStudent(StudentRequestDTO studentRequestDTO){
+    public void addStudent(StudentRequestDto studentRequestDTO){
 
 //        LibraryCard card=new LibraryCard();
 //        // Setting attributes of card
