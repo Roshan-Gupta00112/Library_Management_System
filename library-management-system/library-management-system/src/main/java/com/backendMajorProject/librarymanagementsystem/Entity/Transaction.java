@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
@@ -26,10 +27,13 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     TransactionStatus transactionStatus;
 
-    @CreatedDate
+    @CreationTimestamp
     private Date transactionDate;
 
     private boolean isIssueOperation;   // It tells whether a student is issue or Return a book where true is for issue
+
+    private String message;
+    // It will tell whether the Transaction Completed or Not and if Not then display the reason behind its failure
 
     @ManyToOne
     @JoinColumn
