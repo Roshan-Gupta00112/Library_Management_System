@@ -12,8 +12,11 @@ import com.backendMajorProject.librarymanagementsystem.Repository.BookRepository
 import com.backendMajorProject.librarymanagementsystem.Repository.CardRepository;
 import com.backendMajorProject.librarymanagementsystem.Repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -27,6 +30,9 @@ public class TransactionService {
 
     @Autowired
     TransactionRepository transactionRepository;
+
+    @Autowired
+    private JavaMailSender emailSender;
     public IssueBookResponseDto issueBook(IssueBookRequestDto issueBookRequestDto) throws Exception {
 
         // Create Transaction Object
@@ -103,7 +109,31 @@ public class TransactionService {
         issueBookResponseDto.setTransactionId(transaction.getTransactionNumber());
         issueBookResponseDto.setBookName(book.getTitle());
         issueBookResponseDto.setTransactionStatus(transaction.getTransactionStatus());
+
+        // 6th Step:- Sending an Email
+        String text="Congrats!. " + card.getStudent().getName()+ " You have been issued " +book.getTitle()+ " book";
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("backenddefaultmailid@gmail.com");
+        message.setTo(card.getStudent().getEmail());
+        message.setSubject("Issue Book Notification");
+        message.setText(text);
+        emailSender.send(message);
+
+
         return issueBookResponseDto;
 
+    }
+
+
+    public String getAllSuccessfulTxnsWithCardNo(int cardId){
+        List<Transaction> txns=transactionRepository.getAllSuccessfulTxnsWithCardNo(cardId);
+
+        String ans ="";
+        for(Transaction t:txns){
+            ans+=t.getTransactionNumber();
+            ans+="\n";
+        }
+
+        return ans;
     }
 }
