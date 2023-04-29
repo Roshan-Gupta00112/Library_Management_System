@@ -16,6 +16,8 @@ public class BookRequestDto {
 
     private int price;
 
+    private int numberOfPages;
+
     private Genre genre;
 
     private int authorId;

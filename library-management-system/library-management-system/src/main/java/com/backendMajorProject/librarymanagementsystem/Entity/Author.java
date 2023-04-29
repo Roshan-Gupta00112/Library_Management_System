@@ -24,6 +24,7 @@ public class Author {
 
     private String dob;
 
+    @Column(unique = true)
     private String email;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)

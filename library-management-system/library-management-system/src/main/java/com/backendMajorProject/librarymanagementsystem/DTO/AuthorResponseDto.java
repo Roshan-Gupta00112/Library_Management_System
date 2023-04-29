@@ -1,6 +1,5 @@
 package com.backendMajorProject.librarymanagementsystem.DTO;
 
-import com.backendMajorProject.librarymanagementsystem.Enum.Branch;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,15 +9,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class StudentRequestDto {
+public class AuthorResponseDto {
 
     private String name;
 
-    private String dob;   // In YYYY-MM-DD format
-
-    private Branch branch;
+    private String dob;
 
     private String email;
-
-    private String mobNo;
 }

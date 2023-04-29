@@ -17,13 +17,35 @@ public class BookController {
     BookService bookService;
 
     @PostMapping("/add")
-    public BookResponseDto addBook(@RequestBody BookRequestDto bookRequestDto) throws Exception {
+    public String addBook(@RequestBody BookRequestDto bookRequestDto) throws Exception {
         return bookService.addBook(bookRequestDto);
     }
 
 
     @GetMapping("/get-all-books")
-    public List<Book> getAllBooks(){
+    public List<BookResponseDto> getAllBooks(){
         return bookService.getAllBooks();
+    }
+
+    @GetMapping("/get-all-books-by-an-author")
+    public List<BookResponseDto> getBooksOfAnAuthor(@RequestParam("authorId") int authorId){
+        return bookService.getBooksOfAnAuthor(authorId);
+    }
+
+    @GetMapping("/count-of-books-by-an-author")
+    public int noOfBooksByAnAuthor(@RequestParam("authorId") int authorId){
+        return bookService.noOfBooksByAnAuthor(authorId);
+    }
+
+
+    @GetMapping("/books-with-maximum-pages")
+    public List<BookResponseDto> booksWithMaximumPages(){
+        return bookService.booksWithMaximumPages();
+    }
+
+
+    @GetMapping("/books-with-max-price")
+    public List<BookResponseDto> booksWithMaxPrice(){
+        return bookService.booksWithMaxPrice();
     }
 }

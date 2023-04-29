@@ -31,14 +31,14 @@ public class LibraryCard {
     private CardStatus status;
 
     @CreationTimestamp
-    private Date creationDate;
+    private Date issueDate;
 
     @UpdateTimestamp
     private Date updationDate;
 
     @OneToOne
     @JoinColumn
-    @JsonIgnore
+    //@JsonIgnore
     Student student;
 
     @OneToMany(mappedBy = "libraryCard", cascade = CascadeType.ALL)

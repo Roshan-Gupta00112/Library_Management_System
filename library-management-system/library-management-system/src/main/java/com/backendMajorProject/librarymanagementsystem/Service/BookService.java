@@ -9,6 +9,8 @@ import com.backendMajorProject.librarymanagementsystem.Repository.BookRepository
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -20,7 +22,7 @@ public class BookService {
     @Autowired
     AuthorRepository authorRepository;
 
-    public BookResponseDto addBook(BookRequestDto bookRequestDto) throws Exception {
+    public String addBook(BookRequestDto bookRequestDto) throws Exception {
 
         // Get the Author Object
         Author author = authorRepository.findById(bookRequestDto.getAuthorId()).get();
@@ -29,8 +31,9 @@ public class BookService {
         Book book = new Book();
         book.setTitle(bookRequestDto.getTitle());
         book.setPrice(bookRequestDto.getPrice());
-        book.setGenre(bookRequestDto.getGenre());
+        book.setNumberOfPages(bookRequestDto.getNumberOfPages());
         book.setIssued(false);
+        book.setGenre(bookRequestDto.getGenre());
         book.setAuthor(author);
 
         // Updating Parameters for Author Class
@@ -40,16 +43,131 @@ public class BookService {
 
         // Creating a Response DTO
         BookResponseDto bookResponseDto=new BookResponseDto();
+
         bookResponseDto.setTitle(book.getTitle());
+        bookResponseDto.setNumberOfPages(book.getNumberOfPages());
+        bookResponseDto.setGenre(bookRequestDto.getGenre()); // we can also write book.getGenre()
+        bookResponseDto.setAuthorName(author.getName());
         bookResponseDto.setPrice(book.getPrice());
 
-        return bookResponseDto;
+        return "book added successfully!";
 
     }
 
 
 
-    public List<Book> getAllBooks(){
-        return bookRepository.findAll();
+    public List<BookResponseDto> getAllBooks(){
+
+        List<BookResponseDto> bookResponseDtoList=new ArrayList<>();
+
+        List<Book> bookList=bookRepository.findAll();
+
+        for(Book book:bookList){
+            BookResponseDto bookResponseDto=new BookResponseDto();
+
+            bookResponseDto.setTitle(book.getTitle());
+            bookResponseDto.setNumberOfPages(book.getNumberOfPages());
+            bookResponseDto.setGenre(book.getGenre());
+            bookResponseDto.setAuthorName(book.getAuthor().getName());
+            bookResponseDto.setPrice(book.getPrice());
+
+            bookResponseDtoList.add(bookResponseDto);
+        }
+
+        return bookResponseDtoList;
+    }
+
+
+
+    public List<BookResponseDto> getBooksOfAnAuthor(int authorId){
+        List<Book> bookList=bookRepository.findByAuthor(authorRepository.findById(authorId).get());
+
+        List<BookResponseDto> bookResponseDtoList=new ArrayList<>();
+
+        for(Book book:bookList){
+            BookResponseDto bookResponseDto=new BookResponseDto();
+
+            bookResponseDto.setTitle(book.getTitle());
+            bookResponseDto.setNumberOfPages(book.getNumberOfPages());
+            bookResponseDto.setGenre(book.getGenre());
+            bookResponseDto.setAuthorName(book.getAuthor().getName());
+            bookResponseDto.setPrice(book.getPrice());
+
+            bookResponseDtoList.add(bookResponseDto);
+        }
+
+        return bookResponseDtoList;
+    }
+
+
+    public int noOfBooksByAnAuthor(int authorId){
+        Author author=authorRepository.findById(authorId).get();
+
+        List<Book> bookList=author.getBooks();
+
+        return bookList.size();
+    }
+
+
+    public List<BookResponseDto> booksWithMaximumPages(){
+        List<Book> bookList=bookRepository.findAll();
+
+        Collections.sort(bookList, (a,b) ->{
+            return b.getNumberOfPages()-a.getNumberOfPages();
+        });
+
+        int maxPages=bookList.get(0).getNumberOfPages();
+
+        List<BookResponseDto> bookResponseDtoList=new ArrayList<>();
+
+        for(Book book:bookList){
+            if(book.getNumberOfPages()==maxPages){
+                BookResponseDto bookResponseDto=new BookResponseDto();
+
+                bookResponseDto.setTitle(book.getTitle());
+                bookResponseDto.setNumberOfPages(book.getNumberOfPages());
+                bookResponseDto.setGenre(book.getGenre());
+                bookResponseDto.setAuthorName(book.getAuthor().getName());
+                bookResponseDto.setPrice(book.getPrice());
+
+                bookResponseDtoList.add(bookResponseDto);
+            }
+
+            else break;
+        }
+
+        return bookResponseDtoList;
+    }
+
+
+    public List<BookResponseDto> booksWithMaxPrice(){
+        List<Book> bookList=bookRepository.findAll();
+
+        Collections.sort(bookList, (a,b) ->{
+            return b.getPrice()-a.getPrice();
+        });
+
+        int maxPrice=bookList.get(0).getPrice();
+
+        List<BookResponseDto> bookResponseDtoList=new ArrayList<>();
+
+        for(Book book:bookList){
+
+            if(book.getPrice()==maxPrice){
+
+                BookResponseDto bookResponseDto=new BookResponseDto();
+
+                bookResponseDto.setTitle(book.getTitle());
+                bookResponseDto.setNumberOfPages(book.getNumberOfPages());
+                bookResponseDto.setGenre(book.getGenre());
+                bookResponseDto.setAuthorName(book.getAuthor().getName());
+                bookResponseDto.setPrice(book.getPrice());
+
+                bookResponseDtoList.add(bookResponseDto);
+            }
+            else break;
+        }
+
+        return bookResponseDtoList;
     }
 }

@@ -26,6 +26,8 @@ public class Book {
 
     private int price;
 
+    private int numberOfPages;
+
     private boolean isIssued;
 
     @Enumerated(EnumType.STRING)

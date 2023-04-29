@@ -4,7 +4,9 @@ public enum Branch {
     CS,
     IT,
     MECH,
-    EE,
+    CIVIL,
+    EE,   // Electrical Engineering
+    EEE,  // Electrical and Electronics Engineering
     ECE,
     BIOTECH
 }

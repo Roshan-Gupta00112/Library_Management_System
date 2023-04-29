@@ -21,7 +21,7 @@ public class Student {
 
     private String name;
 
-    private String dob;
+    private String dob;    // In YYYY-MM-DD format
 
     @Enumerated(EnumType.STRING)
     private Branch branch;

@@ -14,11 +14,13 @@ public class StudentResponseDto {
 
     private String name;
 
-    private String dob;
+    private String dob;   // In YYYY-MM-DD format
 
     private Branch branch;
 
     private String email;
 
     private String mobNo;
+
+    CardR
 }

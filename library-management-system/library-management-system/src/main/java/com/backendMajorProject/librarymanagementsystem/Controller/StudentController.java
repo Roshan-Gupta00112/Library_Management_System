@@ -19,7 +19,13 @@ public class StudentController {
     public String addStudent(@RequestBody StudentRequestDto studentRequestDTO){
         studentService.addStudent(studentRequestDTO);
 
-        return "Student added successfully";
+        return "Student has been added successfully";
+    }
+
+
+    @GetMapping("get-student-by-id")
+    public StudentResponseDto getStudentById(@RequestParam("id") int id){
+        return studentService.getStudentById(id);
     }
 
     @GetMapping("/get-all-students")
@@ -49,9 +55,8 @@ public class StudentController {
 
 
 
-
     @PutMapping("/update-mobNo")
-    public StudentResponseMobNoDto updateMobNo(@RequestBody StudentUpdateMobNoRequestDto studentUpdateMobNoRequestDto){
+    public StudentResponseMobNoDto updateMobNo(@RequestBody StudentUpdateMobNoRequestDto studentUpdateMobNoRequestDto) throws StudentNotFoundException{
         return studentService.updateMobNo(studentUpdateMobNoRequestDto);
     }
 

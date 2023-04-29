@@ -1,6 +1,7 @@
 package com.backendMajorProject.librarymanagementsystem.Controller;
 
 import com.backendMajorProject.librarymanagementsystem.DTO.AuthorRequestDto;
+import com.backendMajorProject.librarymanagementsystem.DTO.AuthorResponseDto;
 import com.backendMajorProject.librarymanagementsystem.Entity.Author;
 import com.backendMajorProject.librarymanagementsystem.Service.AuthorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +23,19 @@ public class AuthorController {
         return "Author added successfully";
     }
 
+
+    @GetMapping("/get-by-email")
+    public AuthorResponseDto getAuthorByEmail(@RequestParam("email") String email){
+        return authorService.getByEmail(email);
+    }
+
+
+    @GetMapping("/get-by-dob")
+    public List<AuthorResponseDto> getAuthorByDob(@RequestParam("dob") String dob){
+        return authorService.getByDob(dob);
+    }
     @GetMapping("/get-All-Authors")
-    public List<Author> getAllAuthors(){
+    public List<AuthorResponseDto> getAllAuthors(){
         return authorService.getAllAuthors();
     }
 }
