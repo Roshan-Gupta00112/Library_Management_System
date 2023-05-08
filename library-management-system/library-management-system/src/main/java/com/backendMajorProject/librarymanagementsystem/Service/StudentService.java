@@ -1,14 +1,20 @@
 package com.backendMajorProject.librarymanagementsystem.Service;
 
-import com.backendMajorProject.librarymanagementsystem.DTO.*;
+import com.backendMajorProject.librarymanagementsystem.DTO.Request.*;
+import com.backendMajorProject.librarymanagementsystem.DTO.Response.CardResponseDto;
+import com.backendMajorProject.librarymanagementsystem.DTO.Response.StudentResponseDto;
 import com.backendMajorProject.librarymanagementsystem.Entity.LibraryCard;
 import com.backendMajorProject.librarymanagementsystem.Entity.Student;
+import com.backendMajorProject.librarymanagementsystem.Enum.Branch;
 import com.backendMajorProject.librarymanagementsystem.Enum.CardStatus;
+import com.backendMajorProject.librarymanagementsystem.Exceptions.StudentNotFoundException;
 import com.backendMajorProject.librarymanagementsystem.Repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -17,7 +23,7 @@ public class StudentService {
     @Autowired
     StudentRepository studentRepository;
 
-    public void addStudent(StudentRequestDto studentRequestDTO){
+    public String addStudent(StudentRequestDto studentRequestDTO){
 
 //        LibraryCard card=new LibraryCard();
 //        // Setting attributes of card
@@ -29,6 +35,7 @@ public class StudentService {
 //        student.setCard(card);
 //
 //        studentRepository.save(student);
+
 
         // Now setting the value using DTO
         // create a student object
@@ -42,7 +49,7 @@ public class StudentService {
         // creating a library_card
         LibraryCard card=new LibraryCard();
         // setting attributes of card
-        card.setValidTill("31/03/2025");
+        card.setValidTill("2025-05-01"); // In YYYY-MM-DD format
         card.setStatus(CardStatus.ACTIVATED);
         // setting student attribute in card
         card.setStudent(student);
@@ -52,15 +59,49 @@ public class StudentService {
 
         // saving in the database
         studentRepository.save(student);   // will save both student and card
+
+        return "Student has been added successfully";
     }
 
 
+    public StudentResponseDto getStudentById(int id) throws StudentNotFoundException{
+        try {
+            Student student=studentRepository.findById(id).get();
 
-    public List<Student> getAllStudents(){
-        return studentRepository.findAll();
+            // Prepare StudentResponseDto
+            StudentResponseDto studentResponseDto=new StudentResponseDto();
+
+            // Setting Parameters of StudentResponseDto
+            studentResponseDto.setId(student.getId());
+            studentResponseDto.setName(student.getName());
+            studentResponseDto.setDob(student.getDob());
+            studentResponseDto.setBranch(student.getBranch());
+            studentResponseDto.setEmail(student.getEmail());
+            studentResponseDto.setMobNo(student.getMobNo());
+
+            // Preparing CardResponseDto
+            CardResponseDto cardResponseDto=new CardResponseDto();
+
+            // Setting attributes of CardResponseDto
+            cardResponseDto.setCardNo(student.getCard().getCardNo());
+            cardResponseDto.setIssueDate(student.getCard().getIssueDate());
+            cardResponseDto.setLastUpdatedOn(student.getCard().getUpdationDate());
+            cardResponseDto.setCardStatus(student.getCard().getStatus());
+            cardResponseDto.setValidTill(student.getCard().getValidTill());
+
+            // Setting cardResponseDto  in studentResponseDto
+            studentResponseDto.setCardResponseDto(cardResponseDto);
+
+            return studentResponseDto;
+        }
+        catch (Exception e){
+            throw new StudentNotFoundException("Invalid student id!");
+        }
+
     }
 
-    public List<Student> getAllStudentsByName(String name){
+
+    public List<StudentResponseDto> getAllStudentsByName(String name){
 //        List<Student> allStudents=studentRepository.findAll();
 //
 //        List<Student> studentsByName=new ArrayList<>();
@@ -73,60 +114,579 @@ public class StudentService {
 //
 //        return studentsByName;
 
-        // Using Custom Query
-        return studentRepository.findByName(name);
-    }
+        // Using Custom Query for Attributes
+        List<Student> studentList=studentRepository.findByName(name);
 
-    public String getStudentNameByMobNo(String mobNo){
-        return studentRepository.findByMobNo(mobNo).getName();
-    }
+        List<StudentResponseDto> studentResponseDtoList=new ArrayList<>();
 
-    public String getStudentByEmail(String email){
-        return studentRepository.findByEmail(email).getName();
-    }
+        for(Student student:studentList){
+            StudentResponseDto studentResponseDto=new StudentResponseDto();
 
-    public List<Student> getStudentByDob(String dob){
-        return studentRepository.findByDob(dob);
-    }
+            // Setting attributes of StudentResponseDto
+            studentResponseDto.setId(student.getId());
+            studentResponseDto.setName(student.getName());
+            studentResponseDto.setDob(student.getDob());
+            studentResponseDto.setBranch(student.getBranch());
+            studentResponseDto.setEmail(student.getEmail());
+            studentResponseDto.setMobNo(student.getMobNo());
 
+            CardResponseDto cardResponseDto=new CardResponseDto();
+            cardResponseDto.setCardNo(student.getCard().getCardNo());
+            cardResponseDto.setIssueDate(student.getCard().getIssueDate());
+            cardResponseDto.setLastUpdatedOn(student.getCard().getUpdationDate());
+            cardResponseDto.setCardStatus(student.getCard().getStatus());
+            cardResponseDto.setValidTill(student.getCard().getValidTill());
 
+            studentResponseDto.setCardResponseDto(cardResponseDto);
 
-    public StudentResponseMobNoDto updateMobNo(StudentUpdateMobNoRequestDto studentUpdateMobNoRequestDto){
+            studentResponseDtoList.add(studentResponseDto);
+        }
 
-        // Conversion of Request Dto to a Student Object(Entity)
-        Student student=studentRepository.findById(studentUpdateMobNoRequestDto.getId()).get();
-        // updating the email
-        student.setMobNo(studentUpdateMobNoRequestDto.getMobNo());
-
-        // Updating in Db
-        Student updatedStudent=studentRepository.save(student);
-
-        // Conversion of Updated Student object to Response DTO
-        StudentResponseMobNoDto studentResponseMobNoDto=new StudentResponseMobNoDto();
-        studentResponseMobNoDto.setId(updatedStudent.getId());
-        studentResponseMobNoDto.setName(updatedStudent.getName());
-        studentResponseMobNoDto.setMobNo(updatedStudent.getMobNo());
-
-        return studentResponseMobNoDto;
+        return studentResponseDtoList;
     }
 
 
 
+    public List<StudentResponseDto> getAllStudentsByDob(String dob){
 
-    public StudentResponseEmailDto updateEmail(StudentUpdateEmailRequestDto studentUpdateEmailRequestDto){
+        List<Student>studentList= studentRepository.findByDob(dob);
+        List<StudentResponseDto> studentResponseDtoList=new ArrayList<>();
 
-        Student student=studentRepository.findById(studentUpdateEmailRequestDto.getId()).get();
-        student.setEmail(studentUpdateEmailRequestDto.getEmail());
+        for (Student student:studentList){
+            // Preparing StudentResponseDto and Setting it's all Attributes
+            StudentResponseDto studentResponseDto=new StudentResponseDto();
+            studentResponseDto.setId(student.getId());
+            studentResponseDto.setName(student.getName());
+            studentResponseDto.setDob(student.getDob());
+            studentResponseDto.setBranch(student.getBranch());
+            studentResponseDto.setEmail(student.getEmail());
+            studentResponseDto.setMobNo(student.getMobNo());
 
-        // update in db
-        Student updatedStudent=studentRepository.save(student);
+            // Preparing CardResponseDto and setting it's all attributes
+            CardResponseDto cardResponseDto=new CardResponseDto();
+            cardResponseDto.setCardNo(student.getCard().getCardNo());
+            cardResponseDto.setIssueDate(student.getCard().getIssueDate());
+            cardResponseDto.setLastUpdatedOn(student.getCard().getUpdationDate());
+            cardResponseDto.setCardStatus(student.getCard().getStatus());
+            cardResponseDto.setValidTill(student.getCard().getValidTill());
 
-        // conversion of updated student to response dto
-        StudentResponseEmailDto studentResponseEmailDto=new StudentResponseEmailDto();
-        studentResponseEmailDto.setId(updatedStudent.getId());
-        studentResponseEmailDto.setName(updatedStudent.getName());
-        studentResponseEmailDto.setEmail(updatedStudent.getEmail());
+            // setting CardResponseDto attribute of StudentResponseDto
+            studentResponseDto.setCardResponseDto(cardResponseDto);
 
-        return studentResponseEmailDto;
+            // Adding to final DtoList
+            studentResponseDtoList.add(studentResponseDto);
+        }
+
+        return studentResponseDtoList;
     }
+
+
+    public List<StudentResponseDto> getAllStudentsByBranch(Branch branch){
+
+        List<Student> studentList=studentRepository.findByBranch(branch);
+
+        List<StudentResponseDto> studentResponseDtoList=new ArrayList<>();
+
+        for (Student student:studentList){
+
+            // Preparing StudentResponseDto & Setting it's all attributes
+            StudentResponseDto studentResponseDto=new StudentResponseDto();
+            studentResponseDto.setId(student.getId());
+            studentResponseDto.setName(student.getName());
+            studentResponseDto.setDob(student.getDob());
+            studentResponseDto.setBranch(student.getBranch());
+            studentResponseDto.setEmail(student.getEmail());
+            studentResponseDto.setMobNo(student.getMobNo());
+
+            // Preparing CardResponseDto & Setting it's all attributes
+            CardResponseDto cardResponseDto=new CardResponseDto();
+            cardResponseDto.setCardNo(student.getCard().getCardNo());
+            cardResponseDto.setIssueDate(student.getCard().getIssueDate());
+            cardResponseDto.setLastUpdatedOn(student.getCard().getUpdationDate());
+            cardResponseDto.setCardStatus(student.getCard().getStatus());
+            cardResponseDto.setValidTill(student.getCard().getValidTill());
+
+            // Setting CardResponseDto attribute of StudentResponseDto
+            studentResponseDto.setCardResponseDto(cardResponseDto);
+
+            // Adding StudentResponseDto to the final list
+            studentResponseDtoList.add(studentResponseDto);
+        }
+
+        return studentResponseDtoList;
+    }
+
+
+
+    public StudentResponseDto getStudentByEmail(String email){
+
+        Student student= studentRepository.findByEmail(email);
+
+        // Creating StudentResponseDto and Setting it's all attributes
+        StudentResponseDto studentResponseDto =new StudentResponseDto();
+        studentResponseDto.setId(student.getId());
+        studentResponseDto.setName(student.getName());
+        studentResponseDto.setDob(student.getDob());
+        studentResponseDto.setBranch(student.getBranch());
+        studentResponseDto.setEmail(student.getEmail());
+        studentResponseDto.setMobNo(student.getMobNo());
+
+        // Creating CardResponseDto & Setting it's all attributes
+        CardResponseDto cardResponseDto=new CardResponseDto();
+        cardResponseDto.setCardNo(student.getCard().getCardNo());
+        cardResponseDto.setIssueDate(student.getCard().getIssueDate());
+        cardResponseDto.setLastUpdatedOn(student.getCard().getUpdationDate());
+        cardResponseDto.setCardStatus(student.getCard().getStatus());
+        cardResponseDto.setValidTill(student.getCard().getValidTill());
+
+        // Setting CardResponseDto attribute of StudentResponseDto
+        studentResponseDto.setCardResponseDto(cardResponseDto);
+
+        return studentResponseDto;
+
+    }
+
+
+
+
+    public StudentResponseDto getStudentByMobNo(String mobNo){
+
+        Student student=studentRepository.findByMobNo(mobNo);
+
+        // Creating StudentResponseDto and setting it's all attributes
+        StudentResponseDto studentResponseDto=new StudentResponseDto();
+        studentResponseDto.setId(student.getId());
+        studentResponseDto.setName(student.getName());
+        studentResponseDto.setDob(student.getDob());
+        studentResponseDto.setBranch(student.getBranch());
+        studentResponseDto.setEmail(student.getEmail());
+        studentResponseDto.setMobNo(student.getMobNo());
+
+        // Creating CardResponseDto & Setting it's all attributes
+        CardResponseDto cardResponseDto=new CardResponseDto();
+        cardResponseDto.setCardNo(student.getCard().getCardNo());
+        cardResponseDto.setIssueDate(student.getCard().getIssueDate());
+        cardResponseDto.setLastUpdatedOn(student.getCard().getUpdationDate());
+        cardResponseDto.setCardStatus(student.getCard().getStatus());
+        cardResponseDto.setValidTill(student.getCard().getValidTill());
+
+        // Setting CardResponseDto attribute of StudentResponseDto
+        studentResponseDto.setCardResponseDto(cardResponseDto);
+
+        return studentResponseDto;
+    }
+
+
+    public List<StudentResponseDto> getAllStudents(){
+        List<Student> studentList=studentRepository.findAll();
+
+        List<StudentResponseDto> studentResponseDtoList=new ArrayList<>();
+
+        for(Student student:studentList){
+            StudentResponseDto studentResponseDto=new StudentResponseDto();
+            // Setting attributes of StudentResponseDto
+            studentResponseDto.setId(student.getId());
+            studentResponseDto.setName(student.getName());
+            studentResponseDto.setDob(student.getDob());
+            studentResponseDto.setBranch(student.getBranch());
+            studentResponseDto.setEmail(student.getEmail());
+            studentResponseDto.setMobNo(student.getMobNo());
+
+            // Setting Attribute of CardResponseDto
+            CardResponseDto cardResponseDto=new CardResponseDto();
+            cardResponseDto.setCardNo(student.getCard().getCardNo());
+            cardResponseDto.setIssueDate(student.getCard().getIssueDate());
+            cardResponseDto.setLastUpdatedOn(student.getCard().getUpdationDate());
+            cardResponseDto.setCardStatus(student.getCard().getStatus());
+            cardResponseDto.setValidTill(student.getCard().getValidTill());
+
+            studentResponseDto.setCardResponseDto(cardResponseDto);
+
+            // Adding to final list
+            studentResponseDtoList.add(studentResponseDto);
+        }
+
+        return studentResponseDtoList;
+    }
+
+    public List<StudentResponseDto> findAllStudentsSortedByName(){
+        // getting Student Objects from the DB using CUSTOM COMPLEX QUERY
+        List<Student> studentList=studentRepository.findAllStudentsSortedByNameUsingNativeQuery();
+
+        List<StudentResponseDto> studentResponseDtoList=new ArrayList<>();
+
+        for(Student student:studentList){
+            // Creating StudentResponseDto and setting it's all attributes
+            StudentResponseDto studentResponseDto=new StudentResponseDto();
+            studentResponseDto.setId(student.getId());
+            studentResponseDto.setName(student.getName());
+            studentResponseDto.setDob(student.getDob());
+            studentResponseDto.setBranch(student.getBranch());
+            studentResponseDto.setEmail(student.getEmail());
+            studentResponseDto.setMobNo(student.getMobNo());
+
+            // Creating CardResponseDto and Setting it's all Attributes
+            CardResponseDto cardResponseDto=new CardResponseDto();
+            cardResponseDto.setCardNo(student.getCard().getCardNo());
+            cardResponseDto.setIssueDate(student.getCard().getIssueDate());
+            cardResponseDto.setLastUpdatedOn(student.getCard().getUpdationDate());
+            cardResponseDto.setCardStatus(student.getCard().getStatus());
+            cardResponseDto.setValidTill(student.getCard().getValidTill());
+
+            // Setting CardResponseDto attribute of StudentResponseDto
+            studentResponseDto.setCardResponseDto(cardResponseDto);
+
+            // Adding to final list
+            studentResponseDtoList.add(studentResponseDto);
+        }
+
+        return studentResponseDtoList;
+    }
+
+
+
+
+    private int calculateAge(LocalDate dob){
+        LocalDate todayDate=LocalDate.now();
+
+        if(dob!=null && todayDate!=null){
+            return Period.between(dob, todayDate).getYears();
+        }
+        else return 0;
+    }
+    public List<StudentResponseDto> exactAge(int age){
+
+        // Getting all Students Object from DB
+        List<Student> studentList=studentRepository.findAll();
+
+        List<StudentResponseDto> studentResponseDtoList=new ArrayList<>();
+
+        for(Student student:studentList){
+            LocalDate dOB=LocalDate.parse(student.getDob());
+
+            int studentAge=calculateAge(dOB);
+
+            if(studentAge==age){
+                // Creating StudentResponseDto and setting it's all attributes
+                StudentResponseDto studentResponseDto=new StudentResponseDto();
+                studentResponseDto.setId(student.getId());
+                studentResponseDto.setName(student.getName());
+                studentResponseDto.setDob(student.getDob());
+                studentResponseDto.setBranch(student.getBranch());
+                studentResponseDto.setEmail(student.getEmail());
+                studentResponseDto.setMobNo(student.getMobNo());
+
+                // Creating CardResponseDto & Setting it's all attributes
+                CardResponseDto cardResponseDto=new CardResponseDto();
+                cardResponseDto.setCardNo(student.getCard().getCardNo());
+                cardResponseDto.setIssueDate(student.getCard().getIssueDate());
+                cardResponseDto.setLastUpdatedOn(student.getCard().getUpdationDate());
+                cardResponseDto.setCardStatus(student.getCard().getStatus());
+                cardResponseDto.setValidTill(student.getCard().getValidTill());
+
+                // Setting CardResponseDto attribute of StudentResponseDto
+                studentResponseDto.setCardResponseDto(cardResponseDto);
+
+                // Adding to final list
+                studentResponseDtoList.add(studentResponseDto);
+            }
+        }
+        return studentResponseDtoList;
+    }
+
+    public List<StudentResponseDto> minAge(int age){
+
+        // Getting all Student objects from DB
+        List<Student> studentList=studentRepository.findAll();
+
+        List<StudentResponseDto> studentResponseDtoList=new ArrayList<>();
+
+        for(Student student:studentList){
+
+            LocalDate dOB=LocalDate.parse(student.getDob());
+
+            int studentAge=calculateAge(dOB);
+
+            if(studentAge>=age){
+                // Creating StudentResponseDto and setting it's all attributes
+                StudentResponseDto studentResponseDto=new StudentResponseDto();
+                studentResponseDto.setId(student.getId());
+                studentResponseDto.setName(student.getName());
+                studentResponseDto.setDob(student.getDob());
+                studentResponseDto.setBranch(student.getBranch());
+                studentResponseDto.setEmail(student.getEmail());
+                studentResponseDto.setMobNo(student.getMobNo());
+
+                // Creating CardResponseDto & Setting it's all attributes
+                CardResponseDto cardResponseDto=new CardResponseDto();
+                cardResponseDto.setCardNo(student.getCard().getCardNo());
+                cardResponseDto.setIssueDate(student.getCard().getIssueDate());
+                cardResponseDto.setLastUpdatedOn(student.getCard().getUpdationDate());
+                cardResponseDto.setCardStatus(student.getCard().getStatus());
+                cardResponseDto.setValidTill(student.getCard().getValidTill());
+
+                // Setting CardResponseDto attribute of StudentResponseDto
+                studentResponseDto.setCardResponseDto(cardResponseDto);
+
+                // Adding to final list
+                studentResponseDtoList.add(studentResponseDto);
+            }
+        }
+
+        return studentResponseDtoList;
+    }
+
+
+    public List<StudentResponseDto> maxAge(int age){
+
+        // Getting all Student objects from DB
+        List<Student> studentList=studentRepository.findAll();
+
+        List<StudentResponseDto> studentResponseDtoList=new ArrayList<>();
+
+        for(Student student:studentList){
+
+            LocalDate dOB=LocalDate.parse(student.getDob());
+
+            int studentAge=calculateAge(dOB);
+
+            if(studentAge<=age){
+                // Creating StudentResponseDto and setting it's all attributes
+                StudentResponseDto studentResponseDto=new StudentResponseDto();
+                studentResponseDto.setId(student.getId());
+                studentResponseDto.setName(student.getName());
+                studentResponseDto.setDob(student.getDob());
+                studentResponseDto.setBranch(student.getBranch());
+                studentResponseDto.setEmail(student.getEmail());
+                studentResponseDto.setMobNo(student.getMobNo());
+
+                // Creating CardResponseDto & Setting it's all attributes
+                CardResponseDto cardResponseDto=new CardResponseDto();
+                cardResponseDto.setCardNo(student.getCard().getCardNo());
+                cardResponseDto.setIssueDate(student.getCard().getIssueDate());
+                cardResponseDto.setLastUpdatedOn(student.getCard().getUpdationDate());
+                cardResponseDto.setCardStatus(student.getCard().getStatus());
+                cardResponseDto.setValidTill(student.getCard().getValidTill());
+
+                // Setting CardResponseDto attribute of StudentResponseDto
+                studentResponseDto.setCardResponseDto(cardResponseDto);
+
+                // Adding to final list
+                studentResponseDtoList.add(studentResponseDto);
+            }
+        }
+
+        return studentResponseDtoList;
+    }
+
+
+
+    public List<StudentResponseDto> getAllStudentsWhoseNameStartingWith(char ch){
+
+        // Getting Student Objects from the DB Using CUSTOM COMPLEX QUERY
+        List<Student> studentList=studentRepository.getAllStudentsWhoseNameStartingWith(ch);
+
+        List<StudentResponseDto> studentResponseDtoList=new ArrayList<>();
+
+        for(Student student:studentList){
+            StudentResponseDto studentResponseDto=new StudentResponseDto();
+            // Setting attributes of StudentResponseDto
+            studentResponseDto.setId(student.getId());
+            studentResponseDto.setName(student.getName());
+            studentResponseDto.setDob(student.getDob());
+            studentResponseDto.setBranch(student.getBranch());
+            studentResponseDto.setEmail(student.getEmail());
+            studentResponseDto.setMobNo(student.getMobNo());
+
+            // Setting Attribute of CardResponseDto
+            CardResponseDto cardResponseDto=new CardResponseDto();
+            cardResponseDto.setCardNo(student.getCard().getCardNo());
+            cardResponseDto.setIssueDate(student.getCard().getIssueDate());
+            cardResponseDto.setLastUpdatedOn(student.getCard().getUpdationDate());
+            cardResponseDto.setCardStatus(student.getCard().getStatus());
+            cardResponseDto.setValidTill(student.getCard().getValidTill());
+
+            studentResponseDto.setCardResponseDto(cardResponseDto);
+
+            // Adding to final list
+            studentResponseDtoList.add(studentResponseDto);
+        }
+
+        return studentResponseDtoList;
+    }
+
+
+
+    public StudentResponseDto updateName(UpdateNameRequestDto updateNameRequestDto) throws StudentNotFoundException{
+
+        try {
+            //Getting the Student Object
+            Student student=studentRepository.findById(updateNameRequestDto.getId()).get();
+
+            // setting New Name of the Student
+            student.setName(updateNameRequestDto.getName());
+
+            // Saving it in the DB
+            Student updatedStudent=studentRepository.save(student);
+
+            // Creating StudentResponseDto & Setting it's all parameters
+            StudentResponseDto studentResponseDto=new StudentResponseDto();
+            studentResponseDto.setId(updatedStudent.getId());
+            studentResponseDto.setName(updatedStudent.getName());
+            studentResponseDto.setDob(updatedStudent.getDob());
+            studentResponseDto.setBranch(updatedStudent.getBranch());
+            studentResponseDto.setEmail(updatedStudent.getEmail());
+            studentResponseDto.setMobNo(updatedStudent.getMobNo());
+
+            // Creating CardResponseDto & Setting it's all parameters
+            CardResponseDto cardResponseDto=new CardResponseDto();
+            cardResponseDto.setCardNo(updatedStudent.getCard().getCardNo());
+            cardResponseDto.setIssueDate(updatedStudent.getCard().getIssueDate());
+            cardResponseDto.setLastUpdatedOn(updatedStudent.getCard().getUpdationDate());
+            cardResponseDto.setCardStatus(updatedStudent.getCard().getStatus());
+            cardResponseDto.setValidTill(updatedStudent.getCard().getValidTill());
+
+            // Setting CardResponseDto attribute of StudentResponseDto
+            studentResponseDto.setCardResponseDto(cardResponseDto);
+
+            return studentResponseDto;
+        }
+        catch (Exception e){
+            throw new StudentNotFoundException("Invalid student id!");
+        }
+
+    }
+
+
+
+    public StudentResponseDto updateDob(UpdateDobRequestDto updateDobRequestDto) throws StudentNotFoundException{
+        try{
+            // Getting the Student Object from the DB
+            Student student=studentRepository.findById(updateDobRequestDto.getId()).get();
+            student.setDob(updateDobRequestDto.getDob());
+
+            // Saving Student Object in the Db
+            Student updatedStudent=studentRepository.save(student);
+
+            // Creating StudentResponseDto & Setting all it's attributes
+            StudentResponseDto studentResponseDto=new StudentResponseDto();
+            studentResponseDto.setId(updatedStudent.getId());
+            studentResponseDto.setName(updatedStudent.getName());
+            studentResponseDto.setDob(updatedStudent.getDob());
+            studentResponseDto.setBranch(updatedStudent.getBranch());
+            studentResponseDto.setEmail(updatedStudent.getEmail());
+            studentResponseDto.setMobNo(updatedStudent.getMobNo());
+
+            // Creating CardResponseDto and Setting it's all attributes
+            CardResponseDto cardResponseDto=new CardResponseDto();
+            cardResponseDto.setCardNo(updatedStudent.getCard().getCardNo());
+            cardResponseDto.setIssueDate(updatedStudent.getCard().getIssueDate());
+            cardResponseDto.setLastUpdatedOn(updatedStudent.getCard().getUpdationDate());
+            cardResponseDto.setCardStatus(updatedStudent.getCard().getStatus());
+            cardResponseDto.setValidTill(updatedStudent.getCard().getValidTill());
+
+            // Setting CardResponseDto attribute of StudentResponseDto
+            studentResponseDto.setCardResponseDto(cardResponseDto);
+
+            return studentResponseDto;
+        }
+        catch (Exception e){
+            throw new StudentNotFoundException("Invalid student id!");
+        }
+
+    }
+
+
+    public StudentResponseDto updateEmail(UpdateEmailRequestDto updateEmailRequestDto) throws StudentNotFoundException{
+
+        try {
+            // Getting the Student Object from the DB
+            Student student=studentRepository.findById(updateEmailRequestDto.getId()).get();
+            //Updating email
+            student.setEmail(updateEmailRequestDto.getEmail());
+
+            // updating in db
+            Student updatedStudent=studentRepository.save(student);
+
+            // conversion of updated student to response dto
+            StudentResponseDto studentResponseDto=new StudentResponseDto();
+            studentResponseDto.setId(updatedStudent.getId());
+            studentResponseDto.setName(updatedStudent.getName());
+            studentResponseDto.setDob(updatedStudent.getDob());
+            studentResponseDto.setBranch(updatedStudent.getBranch());
+            studentResponseDto.setEmail(updatedStudent.getEmail());
+            studentResponseDto.setMobNo(updatedStudent.getMobNo());
+
+            // Creating CardResponseDto & Setting it's all attributes
+            CardResponseDto cardResponseDto=new CardResponseDto();
+            cardResponseDto.setCardNo(updatedStudent.getCard().getCardNo());
+            cardResponseDto.setIssueDate(updatedStudent.getCard().getIssueDate());
+            cardResponseDto.setLastUpdatedOn(updatedStudent.getCard().getUpdationDate());
+            cardResponseDto.setCardStatus(updatedStudent.getCard().getStatus());
+            cardResponseDto.setValidTill(updatedStudent.getCard().getValidTill());
+
+            // Setting the CardResponseDto attribute of StudentResponseDto
+            studentResponseDto.setCardResponseDto(cardResponseDto);
+
+            return studentResponseDto;
+        }
+        catch (Exception e){
+            throw new StudentNotFoundException("Invalid student id!");
+        }
+    }
+
+    public StudentResponseDto updateMobNo(UpdateMobNoRequestDto updateMobNoRequestDto) throws StudentNotFoundException {
+
+        try {
+            // Conversion of Request Dto to a Student Object(Entity)
+            Student student = studentRepository.findById(updateMobNoRequestDto.getId()).get();
+            // updating the email
+            student.setMobNo(updateMobNoRequestDto.getMobNo());
+
+            // Updating in Db
+            Student updatedStudent = studentRepository.save(student);
+
+            // Conversion of Updated Student object to Response DTO
+            StudentResponseDto studentResponseDto = new StudentResponseDto();
+            studentResponseDto.setId(updatedStudent.getId());
+            studentResponseDto.setName(updatedStudent.getName());
+            studentResponseDto.setDob(updatedStudent.getDob());
+            studentResponseDto.setBranch(updatedStudent.getBranch());
+            studentResponseDto.setEmail(updatedStudent.getEmail());
+            studentResponseDto.setMobNo(updatedStudent.getMobNo());
+
+            // Creating CardResponseDto & Setting it's all attributes
+            CardResponseDto cardResponseDto=new CardResponseDto();
+            cardResponseDto.setCardNo(updatedStudent.getCard().getCardNo());
+            cardResponseDto.setIssueDate(updatedStudent.getCard().getIssueDate());
+            cardResponseDto.setLastUpdatedOn(updatedStudent.getCard().getUpdationDate());
+            cardResponseDto.setCardStatus(updatedStudent.getCard().getStatus());
+            cardResponseDto.setValidTill(updatedStudent.getCard().getValidTill());
+
+            // Setting CardResponseDto attribute of StudentResponseDto
+            studentResponseDto.setCardResponseDto(cardResponseDto);
+
+            return studentResponseDto;
+        } catch (Exception e) {
+            throw new StudentNotFoundException("Invalid student id!");
+        }
+
+    }
+
+
+    public String deleteStudent(int studId) throws StudentNotFoundException{
+        try {
+            studentRepository.deleteById(studId);
+
+            return "Student deleted successfully!";
+        }catch (Exception e){
+            throw new StudentNotFoundException("Invalid student id!");
+        }
+
+    }
+
+
+
+
+
 }

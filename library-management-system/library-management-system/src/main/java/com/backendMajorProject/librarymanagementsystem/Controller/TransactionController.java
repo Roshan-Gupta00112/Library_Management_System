@@ -1,18 +1,14 @@
 package com.backendMajorProject.librarymanagementsystem.Controller;
 
-import com.backendMajorProject.librarymanagementsystem.DTO.IssueBookRequestDto;
-import com.backendMajorProject.librarymanagementsystem.DTO.IssueBookResponseDto;
-import com.backendMajorProject.librarymanagementsystem.Entity.Transaction;
+import com.backendMajorProject.librarymanagementsystem.DTO.Request.IssueBookRequestDto;
+import com.backendMajorProject.librarymanagementsystem.DTO.Response.IssueBookResponseDto;
 import com.backendMajorProject.librarymanagementsystem.Service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-@Controller
+@RestController
 @RequestMapping("/transaction")
 public class TransactionController {
 
@@ -20,7 +16,7 @@ public class TransactionController {
     TransactionService transactionService;
 
     @PostMapping("/issue")
-    public ResponseEntity issueBook(@RequestBody IssueBookRequestDto issueBookRequestDto) throws Exception {
+    public ResponseEntity issueBook(@RequestBody IssueBookRequestDto issueBookRequestDto) {
         IssueBookResponseDto issueBookResponseDto;
         try {
             issueBookResponseDto= transactionService.issueBook(issueBookRequestDto);
@@ -33,8 +29,8 @@ public class TransactionController {
     }
 
     @GetMapping("/all-successful-transaction")
-    public String getAllSuccessfulTxnsWithCardNo(@RequestParam("cardId") int cardID){
+    public String getAllSuccessfulTxns(@RequestParam("cardId") int cardID){
 
-        return transactionService.getAllSuccessfulTxnsWithCardNo(cardID);
+        return transactionService.getAllSuccessfulTxns(cardID);
     }
 }

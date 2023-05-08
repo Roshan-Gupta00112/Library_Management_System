@@ -1,4 +1,4 @@
-package com.backendMajorProject.librarymanagementsystem.DTO;
+package com.backendMajorProject.librarymanagementsystem.DTO.Request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,13 +7,11 @@ import lombok.Setter;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
 @Setter
-public class StudentResponseMobNoDto {
+@Getter
+public class UpdateNameRequestDto {
 
     private int id;
 
     private String name;
-
-    private String mobNo;
 }

@@ -1,4 +1,4 @@
-package com.backendMajorProject.librarymanagementsystem.DTO;
+package com.backendMajorProject.librarymanagementsystem.DTO.Response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,11 +9,13 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class StudentResponseEmailDto {
+public class AuthorResponseDto {
 
     private int id;
 
     private String name;
+
+    private String dob;   // YY--MM--DD format
 
     private String email;
 }

@@ -22,9 +22,9 @@ public class Author {
 
     private String name;
 
-    private String dob;
+    private String dob;   // YY--MM--DD format
 
-    @Column(unique = true)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)

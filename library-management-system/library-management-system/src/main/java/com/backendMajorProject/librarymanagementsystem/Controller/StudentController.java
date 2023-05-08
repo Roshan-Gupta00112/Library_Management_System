@@ -1,7 +1,9 @@
 package com.backendMajorProject.librarymanagementsystem.Controller;
 
-import com.backendMajorProject.librarymanagementsystem.DTO.*;
-import com.backendMajorProject.librarymanagementsystem.Entity.Student;
+import com.backendMajorProject.librarymanagementsystem.DTO.Request.*;
+import com.backendMajorProject.librarymanagementsystem.DTO.Response.StudentResponseDto;
+import com.backendMajorProject.librarymanagementsystem.Enum.Branch;
+import com.backendMajorProject.librarymanagementsystem.Exceptions.StudentNotFoundException;
 import com.backendMajorProject.librarymanagementsystem.Service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,51 +19,93 @@ public class StudentController {
 
     @PostMapping("/add")
     public String addStudent(@RequestBody StudentRequestDto studentRequestDTO){
-        studentService.addStudent(studentRequestDTO);
-
-        return "Student has been added successfully";
+        return studentService.addStudent(studentRequestDTO);
     }
 
 
-    @GetMapping("get-student-by-id")
-    public StudentResponseDto getStudentById(@RequestParam("id") int id){
+    @GetMapping("/get-student-by-id")
+    public StudentResponseDto getStudentById(@RequestParam("id") int id) throws StudentNotFoundException {
         return studentService.getStudentById(id);
     }
 
-    @GetMapping("/get-all-students")
-    public List<Student> getAllStudents(){
-        return studentService.getAllStudents();
-    }
-
     @GetMapping("/get-students-by-name")
-    public List<Student> getAllStudentsByName(@RequestParam String name){
+    public List<StudentResponseDto> getAllStudentsByName(@RequestParam("name") String name){
         return studentService.getAllStudentsByName(name);
     }
 
-    @GetMapping("/get-student-by-mobNo")
-    public String getStudentNameByMobNo(@RequestParam("mobNo") String mobNo){
-        return studentService.getStudentNameByMobNo(mobNo);
+    @GetMapping("/get-students-by-dob")
+    public List<StudentResponseDto> getAllStudentsByDob(@RequestParam("dob") String dob){
+        return studentService.getAllStudentsByDob(dob);
+    }
+
+    @GetMapping("/get-students-by-branch")
+    public List<StudentResponseDto> getAllStudentsByBranch(@RequestParam("branch")Branch branch){
+        return studentService.getAllStudentsByBranch(branch);
     }
 
     @GetMapping("/get-student-by-email")
-    public String getStudentByEmail(@RequestParam("email") String email){
+    public StudentResponseDto getStudentByEmail(@RequestParam("email") String email){
         return studentService.getStudentByEmail(email);
     }
 
-    @GetMapping("/get-student-by-dob")
-    public List<Student> getStudentByDob(@RequestParam("dob") String dob){
-        return studentService.getStudentByDob(dob);
+    @GetMapping("/get-student-by-mobNo")
+    public StudentResponseDto getStudentByMobNo(@RequestParam("mobNo") String mobNo){
+        return studentService.getStudentByMobNo(mobNo);
     }
 
+    @GetMapping("/get-all-students")
+    public List<StudentResponseDto> getAllStudents(){
+        return studentService.getAllStudents();
+    }
 
+    @GetMapping("/get-students-sorted-by-name")
+    public List<StudentResponseDto> findAllStudentsSortedByName(){
+        return studentService.findAllStudentsSortedByName();
+    }
 
-    @PutMapping("/update-mobNo")
-    public StudentResponseMobNoDto updateMobNo(@RequestBody StudentUpdateMobNoRequestDto studentUpdateMobNoRequestDto) throws StudentNotFoundException{
-        return studentService.updateMobNo(studentUpdateMobNoRequestDto);
+    @GetMapping("/get-students-by-exact-age")
+    public List<StudentResponseDto> exactAge(@RequestParam("age") int age){
+        return studentService.exactAge(age);
+    }
+
+    @GetMapping("/get-students-with-min-age")
+    public List<StudentResponseDto> minAge(@RequestParam("age") int age){
+        return studentService.minAge(age);
+    }
+
+    @GetMapping("/get-students-with-max-age")
+    public List<StudentResponseDto> maxAge(@RequestParam("age") int age){
+        return studentService.maxAge(age);
+    }
+
+    @GetMapping("/get-students-name-starting with")
+    public List<StudentResponseDto> getAllStudentsWhoseNameStartingWith(@RequestParam("firstLetter") char ch){
+        return studentService.getAllStudentsWhoseNameStartingWith(ch);
+    }
+
+    @PutMapping("/update-name")
+    public StudentResponseDto updateName(@RequestBody UpdateNameRequestDto updateNameRequestDto) throws StudentNotFoundException{
+        return studentService.updateName(updateNameRequestDto);
+    }
+
+    @PutMapping("/update-dob")
+    public StudentResponseDto updateDob(@RequestBody UpdateDobRequestDto updateDobRequestDto) throws StudentNotFoundException{
+        return studentService.updateDob(updateDobRequestDto);
     }
 
     @PutMapping("/update-email")
-    public StudentResponseEmailDto updateEmail(@RequestBody StudentUpdateEmailRequestDto studentUpdateEmailRequestDto){
-        return studentService.updateEmail(studentUpdateEmailRequestDto);
+    public StudentResponseDto updateEmail(@RequestBody UpdateEmailRequestDto updateEmailRequestDto) throws StudentNotFoundException{
+        return studentService.updateEmail(updateEmailRequestDto);
+    }
+
+    @PutMapping("/update-mobNo")
+    public StudentResponseDto updateMobNo(@RequestBody UpdateMobNoRequestDto updateMobNoRequestDto) throws StudentNotFoundException {
+        return studentService.updateMobNo(updateMobNoRequestDto);
+    }
+
+
+    @DeleteMapping("/delete")
+    public String deleteStudent(@RequestParam("id") int id) throws StudentNotFoundException{
+        return studentService.deleteStudent(id);
     }
 }

@@ -1,4 +1,4 @@
-package com.backendMajorProject.librarymanagementsystem.DTO;
+package com.backendMajorProject.librarymanagementsystem.DTO.Response;
 
 import com.backendMajorProject.librarymanagementsystem.Enum.Genre;
 import lombok.AllArgsConstructor;
@@ -15,6 +15,8 @@ public class BookResponseDto {
     private String title;
 
     private int numberOfPages;
+
+    private int quantity;
 
     private Genre genre;
 

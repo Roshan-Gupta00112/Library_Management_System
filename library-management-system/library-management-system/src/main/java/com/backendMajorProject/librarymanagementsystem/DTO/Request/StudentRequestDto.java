@@ -1,4 +1,4 @@
-package com.backendMajorProject.librarymanagementsystem.DTO;
+package com.backendMajorProject.librarymanagementsystem.DTO.Request;
 
 import com.backendMajorProject.librarymanagementsystem.Enum.Branch;
 import lombok.AllArgsConstructor;

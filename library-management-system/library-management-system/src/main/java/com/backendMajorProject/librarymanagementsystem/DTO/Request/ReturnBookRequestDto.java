@@ -1,4 +1,4 @@
-package com.backendMajorProject.librarymanagementsystem.DTO;
+package com.backendMajorProject.librarymanagementsystem.DTO.Request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,11 +7,11 @@ import lombok.Setter;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
 @Setter
-public class StudentUpdateMobNoRequestDto {
+@Getter
+public class ReturnBookRequestDto {
 
-    private int id;
+    private int cardId;
 
-    private String mobNo;
+    private int bookId;
 }

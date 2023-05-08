@@ -1,8 +1,7 @@
 package com.backendMajorProject.librarymanagementsystem.Controller;
 
-import com.backendMajorProject.librarymanagementsystem.DTO.AuthorRequestDto;
-import com.backendMajorProject.librarymanagementsystem.DTO.AuthorResponseDto;
-import com.backendMajorProject.librarymanagementsystem.Entity.Author;
+import com.backendMajorProject.librarymanagementsystem.DTO.Request.AuthorRequestDto;
+import com.backendMajorProject.librarymanagementsystem.DTO.Response.AuthorResponseDto;
 import com.backendMajorProject.librarymanagementsystem.Service.AuthorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,12 +16,25 @@ public class AuthorController {
     AuthorService authorService;
 
     @PostMapping("/add")
-    public String addAuthor(@RequestBody AuthorRequestDto authorRequestDto){
-        authorService.addAuthor(authorRequestDto);
-
-        return "Author added successfully";
+    public AuthorResponseDto addAuthor(@RequestBody AuthorRequestDto authorRequestDto){
+        return authorService.addAuthor(authorRequestDto);
     }
 
+
+    @GetMapping("/get-by-id")
+    public AuthorResponseDto getById(@RequestParam("id") int id){
+        return authorService.getById(id);
+    }
+
+    @GetMapping("/get-by-name")
+    public List<AuthorResponseDto> getByName(@RequestParam("name") String name){
+        return authorService.getByName(name);
+    }
+
+    @GetMapping("/get-by-dob")
+    public List<AuthorResponseDto> getAuthorByDob(@RequestParam("dob") String dob){
+        return authorService.getByDob(dob);
+    }
 
     @GetMapping("/get-by-email")
     public AuthorResponseDto getAuthorByEmail(@RequestParam("email") String email){
@@ -30,10 +42,7 @@ public class AuthorController {
     }
 
 
-    @GetMapping("/get-by-dob")
-    public List<AuthorResponseDto> getAuthorByDob(@RequestParam("dob") String dob){
-        return authorService.getByDob(dob);
-    }
+
     @GetMapping("/get-All-Authors")
     public List<AuthorResponseDto> getAllAuthors(){
         return authorService.getAllAuthors();

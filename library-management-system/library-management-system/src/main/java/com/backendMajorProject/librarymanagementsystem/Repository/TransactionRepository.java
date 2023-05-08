@@ -12,5 +12,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     // to Get the List of all Successful Transaction done by a User with given CardId
     @Query(value = "select * from transaction t where t.library_card_card_no=:cardId AND t.transaction_status='SUCCESS'",
             nativeQuery = true)
-    List<Transaction> getAllSuccessfulTxnsWithCardNo(int cardId);
+    List<Transaction> getAllSuccessfulTxns(int cardId);
 }

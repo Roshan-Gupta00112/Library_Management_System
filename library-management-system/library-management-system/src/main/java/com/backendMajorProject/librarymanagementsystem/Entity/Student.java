@@ -19,17 +19,19 @@ public class Student {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Column(nullable = false)
     private String name;
 
+    @Column(name = "DOB", nullable = false)
     private String dob;    // In YYYY-MM-DD format
 
     @Enumerated(EnumType.STRING)
     private Branch branch;
 
-    @Column(unique = true)
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(unique = true)
+    @Column(nullable = false, unique = true)
     private String mobNo;
 
     @OneToOne(mappedBy = "student", cascade = CascadeType.ALL)

@@ -1,5 +1,7 @@
-package com.backendMajorProject.librarymanagementsystem.DTO;
+package com.backendMajorProject.librarymanagementsystem.DTO.Response;
 
+import com.backendMajorProject.librarymanagementsystem.DTO.Request.ReturnBookRequestDto;
+import com.backendMajorProject.librarymanagementsystem.Entity.LibraryCard;
 import com.backendMajorProject.librarymanagementsystem.Enum.TransactionStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,3 +20,4 @@ public class IssueBookResponseDto {
 
     private TransactionStatus transactionStatus;
 }
+

@@ -1,4 +1,4 @@
-package com.backendMajorProject.librarymanagementsystem.DTO;
+package com.backendMajorProject.librarymanagementsystem.DTO.Response;
 
 import com.backendMajorProject.librarymanagementsystem.Enum.Branch;
 import lombok.AllArgsConstructor;
@@ -12,6 +12,8 @@ import lombok.Setter;
 @Setter
 public class StudentResponseDto {
 
+    private int id;
+
     private String name;
 
     private String dob;   // In YYYY-MM-DD format
@@ -22,5 +24,5 @@ public class StudentResponseDto {
 
     private String mobNo;
 
-    CardR
+    CardResponseDto cardResponseDto;
 }

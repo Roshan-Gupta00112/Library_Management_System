@@ -1,4 +1,4 @@
-package com.backendMajorProject.librarymanagementsystem.DTO;
+package com.backendMajorProject.librarymanagementsystem.DTO.Request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,11 +7,11 @@ import lombok.Setter;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Setter
 @Getter
-public class IssueBookRequestDto {
+@Setter
+public class UpdateEmailRequestDto {
 
-    private int cardId;
+    private int id;
 
-    private int bookId;
+    private String email;
 }

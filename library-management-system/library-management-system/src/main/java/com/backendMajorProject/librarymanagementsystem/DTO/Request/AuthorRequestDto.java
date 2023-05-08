@@ -1,4 +1,4 @@
-package com.backendMajorProject.librarymanagementsystem.DTO;
+package com.backendMajorProject.librarymanagementsystem.DTO.Request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +13,7 @@ public class AuthorRequestDto {
 
     private String name;
 
-    private String dob;
+    private String dob;  // YY--MM--DD format
 
     private String email;
 }

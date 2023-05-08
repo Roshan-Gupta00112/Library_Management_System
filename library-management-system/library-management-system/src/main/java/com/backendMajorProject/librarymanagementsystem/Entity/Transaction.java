@@ -16,6 +16,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Getter
 @Setter
+@Table(name = "transaction")
 public class Transaction {
 
     @Id
@@ -25,7 +26,7 @@ public class Transaction {
     private String transactionNumber;
 
     @Enumerated(EnumType.STRING)
-    TransactionStatus transactionStatus;
+    private TransactionStatus transactionStatus;
 
     @CreationTimestamp
     private Date transactionDate;

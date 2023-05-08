@@ -1,4 +1,4 @@
-package com.backendMajorProject.librarymanagementsystem.DTO;
+package com.backendMajorProject.librarymanagementsystem.DTO.Request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,11 +9,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class AuthorResponseDto {
+public class UpdateMobNoRequestDto {
 
-    private String name;
+    private int id;
 
-    private String dob;
-
-    private String email;
+    private String mobNo;
 }
