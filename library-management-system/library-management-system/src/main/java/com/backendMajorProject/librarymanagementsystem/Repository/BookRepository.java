@@ -23,11 +23,11 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
 
     // Native Complex Query for Max Pages
     @Query(value = "select * from book where number_of_pages=(select MAX(number_of_pages)from book)", nativeQuery = true)
-    List<Book> getBooksWithMaximumPages();
+    List<Book> booksWithMaximumPages();
 
     // Native Complex Query for Max Price
     @Query(value = "select * from book where price=(select MAX(price) from book) ", nativeQuery = true)
-    List<Book> getBooksWithMaximumPrice();
+    List<Book> booksWithMaximumPrice();
 
 
     // Native Complex Query for 2nd Max Pages
@@ -37,6 +37,11 @@ public interface BookRepository extends JpaRepository<Book, Integer> {
     List<Book> booksHavingSecondMaxPages();
 
     // Native Complex Query for 2nd Max Price
-    @Query(value = "select *from book where price=(select MAX(price) from book where price<(select MAX(price) from book ))", nativeQuery = true)
+    @Query(value = "select * from book where price=(select MAX(price) from book where price<(select MAX(price) from book ))", nativeQuery = true)
     List<Book> booksHavingSecondMaxPrice();
+
+
+    // Custom Complex Query to get List of Books with Maximum Quantity
+    @Query(value = "select * from book b WHERE b.quantity=(select MAX(quantity) from book)", nativeQuery = true)
+    List<Book> booksWithMaximumQuantity();
 }

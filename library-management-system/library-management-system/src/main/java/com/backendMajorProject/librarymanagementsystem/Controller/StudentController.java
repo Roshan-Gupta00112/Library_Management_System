@@ -1,6 +1,8 @@
 package com.backendMajorProject.librarymanagementsystem.Controller;
 
 import com.backendMajorProject.librarymanagementsystem.DTO.Request.*;
+import com.backendMajorProject.librarymanagementsystem.DTO.Response.IssuedBookResponseDto;
+import com.backendMajorProject.librarymanagementsystem.DTO.Response.ReturnedBookResponseDto;
 import com.backendMajorProject.librarymanagementsystem.DTO.Response.StudentResponseDto;
 import com.backendMajorProject.librarymanagementsystem.Enum.Branch;
 import com.backendMajorProject.librarymanagementsystem.Exceptions.StudentNotFoundException;
@@ -83,6 +85,17 @@ public class StudentController {
         return studentService.getAllStudentsWhoseNameStartingWith(ch);
     }
 
+    @GetMapping("/all-books-issued")
+    public List<IssuedBookResponseDto> booksIssuedByStudent(@RequestParam("id") int studId){
+        return studentService.booksIssuedByStudent(studId);
+    }
+
+    @GetMapping("/all-books-returned")
+    public List<ReturnedBookResponseDto> booksReturnedByStudent(@RequestParam("id") int studId){
+        return studentService.booksReturnedByStudent(studId);
+    }
+
+
     @PutMapping("/update-name")
     public StudentResponseDto updateName(@RequestBody UpdateNameRequestDto updateNameRequestDto) throws StudentNotFoundException{
         return studentService.updateName(updateNameRequestDto);
@@ -105,7 +118,7 @@ public class StudentController {
 
 
     @DeleteMapping("/delete")
-    public String deleteStudent(@RequestParam("id") int id) throws StudentNotFoundException{
+    public String deleteStudent(@RequestParam("id") int id) throws Exception{
         return studentService.deleteStudent(id);
     }
 }

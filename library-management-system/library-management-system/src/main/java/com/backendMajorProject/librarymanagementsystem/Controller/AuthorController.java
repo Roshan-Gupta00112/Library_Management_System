@@ -41,8 +41,6 @@ public class AuthorController {
         return authorService.getByEmail(email);
     }
 
-
-
     @GetMapping("/get-All-Authors")
     public List<AuthorResponseDto> getAllAuthors(){
         return authorService.getAllAuthors();

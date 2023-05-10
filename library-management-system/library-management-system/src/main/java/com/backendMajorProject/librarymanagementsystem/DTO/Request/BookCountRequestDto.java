@@ -9,7 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Setter
 @Getter
-public class ParticularBookRequestDto {
+public class BookCountRequestDto {
 
     private int bookId;
 

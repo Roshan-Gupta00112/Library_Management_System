@@ -1,7 +1,7 @@
 package com.backendMajorProject.librarymanagementsystem.Service;
 
 import com.backendMajorProject.librarymanagementsystem.DTO.Request.BookRequestDto;
-import com.backendMajorProject.librarymanagementsystem.DTO.Request.ParticularBookRequestDto;
+import com.backendMajorProject.librarymanagementsystem.DTO.Request.BookCountRequestDto;
 import com.backendMajorProject.librarymanagementsystem.DTO.Response.BookResponseDto;
 import com.backendMajorProject.librarymanagementsystem.Entity.Author;
 import com.backendMajorProject.librarymanagementsystem.Entity.Book;
@@ -9,7 +9,6 @@ import com.backendMajorProject.librarymanagementsystem.Repository.AuthorReposito
 import com.backendMajorProject.librarymanagementsystem.Repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,6 +52,7 @@ public class BookService {
         // Creating a Response DTO
         BookResponseDto bookResponseDto=new BookResponseDto();
 
+        bookResponseDto.setId(book.getId());
         bookResponseDto.setTitle(book.getTitle());
         bookResponseDto.setNumberOfPages(book.getNumberOfPages());
         bookResponseDto.setQuantity(book.getQuantity());
@@ -65,20 +65,20 @@ public class BookService {
     }
 
 
-    public BookResponseDto addParticularBook(ParticularBookRequestDto particularBookRequestDto){
+    public BookResponseDto increaseParticularBookCount(BookCountRequestDto bookCountRequestDto){
 
         // Getting Book Object from the DB
-        Book book=bookRepository.findById(particularBookRequestDto.getBookId()).get();
+        Book book=bookRepository.findById(bookCountRequestDto.getBookId()).get();
 
         // Increasing the Book Quantity
-        book.setQuantity(book.getQuantity()+ particularBookRequestDto.getQuantity());
+        book.setQuantity(book.getQuantity()+ bookCountRequestDto.getQuantity());
 
         // Saving Book in the DB
         Book updatedBook=bookRepository.save(book);
 
 
         // Creating BookResponseDto and Setting it's all attributes using All Args Constructor
-        BookResponseDto bookResponseDto=new BookResponseDto(book.getTitle(), book.getNumberOfPages(), book.getQuantity(),
+        BookResponseDto bookResponseDto=new BookResponseDto(book.getId(), book.getTitle(), book.getNumberOfPages(), book.getQuantity(),
                 book.getGenre(), book.getAuthor().getName(), book.getPrice());
 
         return bookResponseDto;
@@ -87,6 +87,26 @@ public class BookService {
         //        the count of that book. So, here no need to add that book in the Book List of the Author again
 
     }
+
+
+
+    public BookResponseDto decreaseParticularBookCount(BookCountRequestDto bookCountRequestDto){
+        // Getting Book Object from the DB
+        Book book=bookRepository.findById(bookCountRequestDto.getBookId()).get();
+
+        book.setQuantity(book.getQuantity()-bookCountRequestDto.getQuantity());
+
+        // Saving it in the DB
+        Book updatedBook=bookRepository.save(book);
+
+        // Creating BookResponseDto and setting it's all Attributes
+        BookResponseDto bookResponseDto=new BookResponseDto(updatedBook.getId(), updatedBook.getTitle(),
+                updatedBook.getNumberOfPages(), updatedBook.getQuantity(), updatedBook.getGenre(),
+                updatedBook.getAuthor().getName(), updatedBook.getPrice());
+
+        return bookResponseDto;
+    }
+
 
     public List<BookResponseDto> getAllBooks(){
 
@@ -97,6 +117,7 @@ public class BookService {
         for(Book book:bookList){
             BookResponseDto bookResponseDto=new BookResponseDto();
 
+            bookResponseDto.setId(book.getId());
             bookResponseDto.setTitle(book.getTitle());
             bookResponseDto.setNumberOfPages(book.getNumberOfPages());
             bookResponseDto.setQuantity(book.getQuantity());
@@ -118,7 +139,7 @@ public class BookService {
         List<BookResponseDto> bookResponseDtoList=new ArrayList<>();
 
         for(Book book:bookList){
-            BookResponseDto bookResponseDto=new BookResponseDto(book.getTitle(), book.getNumberOfPages(), book.getQuantity(),
+            BookResponseDto bookResponseDto=new BookResponseDto(book.getId(), book.getTitle(), book.getNumberOfPages(), book.getQuantity(),
                     book.getGenre(), book.getAuthor().getName(), book.getPrice());
 
 //            bookResponseDto.setTitle(book.getTitle());
@@ -146,7 +167,7 @@ public class BookService {
 
 
     // Finding Books with Maximum pages Without Using Complex Native Query
-    public List<BookResponseDto> booksWithMaximumPages(){
+    public List<BookResponseDto> booksWithMaxPages(){
         List<Book> bookList=bookRepository.findAll();
 
         Collections.sort(bookList, (a,b) ->{
@@ -161,8 +182,10 @@ public class BookService {
             if(book.getNumberOfPages()==maxPages){
                 BookResponseDto bookResponseDto=new BookResponseDto();
 
+                bookResponseDto.setId(book.getId());
                 bookResponseDto.setTitle(book.getTitle());
                 bookResponseDto.setNumberOfPages(book.getNumberOfPages());
+                bookResponseDto.setQuantity(book.getQuantity());
                 bookResponseDto.setGenre(book.getGenre());
                 bookResponseDto.setAuthorName(book.getAuthor().getName());
                 bookResponseDto.setPrice(book.getPrice());
@@ -195,8 +218,10 @@ public class BookService {
 
                 BookResponseDto bookResponseDto=new BookResponseDto();
 
+                bookResponseDto.setId(book.getId());
                 bookResponseDto.setTitle(book.getTitle());
                 bookResponseDto.setNumberOfPages(book.getNumberOfPages());
+                bookResponseDto.setQuantity(book.getQuantity());
                 bookResponseDto.setGenre(book.getGenre());
                 bookResponseDto.setAuthorName(book.getAuthor().getName());
                 bookResponseDto.setPrice(book.getPrice());
@@ -213,16 +238,16 @@ public class BookService {
 
 
     // Finding Books with Maximum pages USing Complex Native Query
-    public List<BookResponseDto> getBooksWithMaximumPages(){
+    public List<BookResponseDto> booksWithMaximumPages(){
 
         // Getting Book Objects from CUSTOM COMPLEX QUERY
-        List<Book> bookList=bookRepository.getBooksWithMaximumPages();
+        List<Book> bookList=bookRepository.booksWithMaximumPages();
 
         List<BookResponseDto> bookResponseDtoList=new ArrayList<>();
 
         for(Book book:bookList){
             // creating BookResponseDto & Setting it's all Attributes
-            BookResponseDto bookResponseDto=new BookResponseDto(book.getTitle(),book.getNumberOfPages(),book.getQuantity(),
+            BookResponseDto bookResponseDto=new BookResponseDto(book.getId(), book.getTitle(),book.getNumberOfPages(),book.getQuantity(),
                     book.getGenre(), book.getAuthor().getName(), book.getPrice());
 //            bookResponseDto.setTitle(book.getTitle());
 //            bookResponseDto.setNumberOfPages(book.getNumberOfPages());
@@ -238,16 +263,16 @@ public class BookService {
 
 
     // Finding Books with Maximum Price USING Complex Native Query
-    public List<BookResponseDto> getBooksWithMaximumPrice(){
+    public List<BookResponseDto> booksWithMaximumPrice(){
 
         // Getting Book Objects from CUSTOM COMPLEX QUERY
-        List<Book> bookList=bookRepository.getBooksWithMaximumPrice();
+        List<Book> bookList=bookRepository.booksWithMaximumPrice();
 
         List<BookResponseDto> bookResponseDtoList=new ArrayList<>();
 
         for(Book book:bookList){
             // creating BookResponseDto & Setting it's all Attributes
-            BookResponseDto bookResponseDto=new BookResponseDto(book.getTitle(),book.getNumberOfPages(),book.getQuantity(),
+            BookResponseDto bookResponseDto=new BookResponseDto(book.getId(), book.getTitle(),book.getNumberOfPages(),book.getQuantity(),
                     book.getGenre(), book.getAuthor().getName(), book.getPrice());
 //            bookResponseDto.setTitle(book.getTitle());
 //            bookResponseDto.setNumberOfPages(book.getNumberOfPages());
@@ -270,7 +295,7 @@ public class BookService {
 
         for(Book book:bookList){
             // creating BookResponseDto & Setting it's all Attributes
-            BookResponseDto bookResponseDto=new BookResponseDto(book.getTitle(),book.getNumberOfPages(),book.getQuantity(),
+            BookResponseDto bookResponseDto=new BookResponseDto(book.getId(), book.getTitle(),book.getNumberOfPages(),book.getQuantity(),
                     book.getGenre(), book.getAuthor().getName(), book.getPrice());
 //            bookResponseDto.setTitle(book.getTitle());
 //            bookResponseDto.setNumberOfPages(book.getNumberOfPages());
@@ -285,7 +310,6 @@ public class BookService {
         return bookResponseDtoList;
     }
 
-    @GetMapping("/books-with-second-max-price")
     public List<BookResponseDto> booksHavingSecondMaxPrice(){
 
         // Getting Book Objects from CUSTOM COMPLEX QUERY
@@ -295,7 +319,7 @@ public class BookService {
 
         for(Book book:bookList){
             // creating BookResponseDto & Setting it's all Attributes
-            BookResponseDto bookResponseDto=new BookResponseDto(book.getTitle(), book.getNumberOfPages(), book.getQuantity(),
+            BookResponseDto bookResponseDto=new BookResponseDto(book.getId(), book.getTitle(), book.getNumberOfPages(), book.getQuantity(),
                     book.getGenre(), book.getAuthor().getName(), book.getPrice());
 //            bookResponseDto.setTitle(book.getTitle());
 //            bookResponseDto.setNumberOfPages(book.getNumberOfPages());
@@ -310,6 +334,22 @@ public class BookService {
         return bookResponseDtoList;
     }
 
+
+    public List<BookResponseDto> booksWithMaximumQuantity(){
+        // Getting List of Books with Maximum quantity from DB
+        List<Book> bookList= bookRepository.booksWithMaximumQuantity();
+
+        List<BookResponseDto> bookResponseDtoList=new ArrayList<>();
+
+        for (Book book:bookList){
+            BookResponseDto bookResponseDto=new BookResponseDto(book.getId(), book.getTitle(), book.getNumberOfPages(),
+                    book.getQuantity(), book.getGenre(), book.getAuthor().getName(), book.getPrice());
+
+            bookResponseDtoList.add(bookResponseDto);
+        }
+
+        return bookResponseDtoList;
+    }
 
     public String removeParticularBooksFromLibrary(int bookId){
         // Getting Book Object from DB

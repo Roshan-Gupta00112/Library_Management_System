@@ -16,8 +16,12 @@ public class IssueBookResponseDto {
 
     private String transactionId;
 
+    private int bookId;
+
     private String bookName;
 
-    private TransactionStatus transactionStatus;
+    private String authorName;
+
+    //private TransactionStatus transactionStatus;
 }
 

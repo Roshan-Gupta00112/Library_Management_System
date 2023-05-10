@@ -1,7 +1,7 @@
 package com.backendMajorProject.librarymanagementsystem.Controller;
 
 import com.backendMajorProject.librarymanagementsystem.DTO.Request.BookRequestDto;
-import com.backendMajorProject.librarymanagementsystem.DTO.Request.ParticularBookRequestDto;
+import com.backendMajorProject.librarymanagementsystem.DTO.Request.BookCountRequestDto;
 import com.backendMajorProject.librarymanagementsystem.DTO.Response.BookResponseDto;
 import com.backendMajorProject.librarymanagementsystem.Service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +21,18 @@ public class BookController {
         return bookService.addBook(bookRequestDto);
     }
 
-    @PostMapping("/add-particular-book")
-    public BookResponseDto addParticularBook(@RequestBody ParticularBookRequestDto particularBookRequestDto){
-        return bookService.addParticularBook(particularBookRequestDto);
+    @PutMapping("/increase-particular-book-count")
+    public BookResponseDto increaseParticularBookCount(@RequestBody BookCountRequestDto bookCountRequestDto){
+        return bookService.increaseParticularBookCount(bookCountRequestDto);
     }
+
+    @PutMapping("/decrease-particular-book-count")
+    public BookResponseDto decreaseParticularBookCount(@RequestBody BookCountRequestDto bookCountRequestDto){
+        return bookService.decreaseParticularBookCount(bookCountRequestDto);
+    }
+
+
+
 
     @GetMapping("/get-all-books")
     public List<BookResponseDto> getAllBooks(){
@@ -43,8 +51,8 @@ public class BookController {
 
     // Finding the Book with Max Pages without using custom native query
     @GetMapping("/books-with-max-pages")
-    public List<BookResponseDto> booksWithMaximumPages(){
-        return bookService.booksWithMaximumPages();
+    public List<BookResponseDto> booksWithMaxPages(){
+        return bookService.booksWithMaxPages();
     }
 
     // Finding the Book with Max Price without using custom native query
@@ -56,14 +64,14 @@ public class BookController {
 
     // Finding the Book with Max Pages USING Custom Native Query
     @GetMapping("/books-with-maximum-pages")
-    public List<BookResponseDto> getBooksWithMaximumPages(){
-        return bookService.getBooksWithMaximumPages();
+    public List<BookResponseDto> booksWithMaximumPages(){
+        return bookService.booksWithMaximumPages();
     }
 
     // Finding the Book with Max Price USING Custom Native Query
     @GetMapping("/books-with-maximum-price")
-    public List<BookResponseDto> getBooksWithMaximumPrice(){
-        return bookService.getBooksWithMaximumPrice();
+    public List<BookResponseDto> booksWithMaximumPrice(){
+        return bookService.booksWithMaximumPrice();
     }
 
     @GetMapping("/books-with-second-max-pages")
@@ -76,8 +84,13 @@ public class BookController {
         return bookService.booksHavingSecondMaxPrice();
     }
 
+    @GetMapping("/books-with-maximum-quantity")
+    public List<BookResponseDto> booksWithMaximumQuantity(){
+        return bookService.booksWithMaximumQuantity();
+    }
 
-    @DeleteMapping("delete-all-the-counts-of-particular-book")
+
+    @DeleteMapping("/delete-all-the-counts-of-particular-book")
     public String removeParticularBooksFromLibrary(@RequestParam("bookId") int bookId){
         return bookService.removeParticularBooksFromLibrary(bookId);
     }

@@ -2,11 +2,16 @@ package com.backendMajorProject.librarymanagementsystem.Service;
 
 import com.backendMajorProject.librarymanagementsystem.DTO.Request.*;
 import com.backendMajorProject.librarymanagementsystem.DTO.Response.CardResponseDto;
+import com.backendMajorProject.librarymanagementsystem.DTO.Response.IssuedBookResponseDto;
+import com.backendMajorProject.librarymanagementsystem.DTO.Response.ReturnedBookResponseDto;
 import com.backendMajorProject.librarymanagementsystem.DTO.Response.StudentResponseDto;
+import com.backendMajorProject.librarymanagementsystem.Entity.Book;
 import com.backendMajorProject.librarymanagementsystem.Entity.LibraryCard;
 import com.backendMajorProject.librarymanagementsystem.Entity.Student;
+import com.backendMajorProject.librarymanagementsystem.Entity.Transaction;
 import com.backendMajorProject.librarymanagementsystem.Enum.Branch;
 import com.backendMajorProject.librarymanagementsystem.Enum.CardStatus;
+import com.backendMajorProject.librarymanagementsystem.Enum.TransactionStatus;
 import com.backendMajorProject.librarymanagementsystem.Exceptions.StudentNotFoundException;
 import com.backendMajorProject.librarymanagementsystem.Repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -516,6 +521,53 @@ public class StudentService {
     }
 
 
+    public List<IssuedBookResponseDto> booksIssuedByStudent(int studId){
+
+        // Getting the Card Object from the DB
+        LibraryCard card=studentRepository.findById(studId).get().getCard();
+
+        // Getting All the Transaction List
+        List<Transaction> transactions=card.getTransactionList();
+
+        List<IssuedBookResponseDto> issuedBookResponseDtoList=new ArrayList<>();
+
+        for(Transaction transaction:transactions){
+            if(transaction.getTransactionStatus()==TransactionStatus.SUCCESS && transaction.isIssueOperation()==true){
+                IssuedBookResponseDto issuedBookResponseDto=new IssuedBookResponseDto(transaction.getTransactionNumber(),
+                        transaction.getTransactionDate(), transaction.getBook().getId(), transaction.getBook().getTitle(),
+                        transaction.getBook().getAuthor().getName());
+
+                issuedBookResponseDtoList.add(issuedBookResponseDto);
+            }
+        }
+        return issuedBookResponseDtoList;
+    }
+
+    public List<ReturnedBookResponseDto> booksReturnedByStudent(int studId){
+
+        // Getting the Card Object from the DB
+        LibraryCard card=studentRepository.findById(studId).get().getCard();
+
+        // Getting Transaction List
+        List<Transaction> transactions=card.getTransactionList();
+
+        List<ReturnedBookResponseDto> returnedBookResponseDtoList=new ArrayList<>();
+
+        for (Transaction transaction:transactions){
+            if(transaction.getTransactionStatus()==TransactionStatus.SUCCESS && transaction.isIssueOperation()==false){
+                ReturnedBookResponseDto returnedBookResponseDto=new ReturnedBookResponseDto(transaction.getTransactionNumber(),
+                        transaction.getTransactionDate(), transaction.getBook().getId(), transaction.getBook().getTitle(),
+                        transaction.getBook().getAuthor().getName());
+
+                returnedBookResponseDtoList.add(returnedBookResponseDto);
+            }
+        }
+
+        return returnedBookResponseDtoList;
+    }
+
+
+
 
     public StudentResponseDto updateName(UpdateNameRequestDto updateNameRequestDto) throws StudentNotFoundException{
 
@@ -674,15 +726,32 @@ public class StudentService {
     }
 
 
-    public String deleteStudent(int studId) throws StudentNotFoundException{
+    public String deleteStudent(int studId) throws Exception{
+        Student student;
         try {
-            studentRepository.deleteById(studId);
-
-            return "Student deleted successfully!";
+            student=studentRepository.findById(studId).get();
         }catch (Exception e){
             throw new StudentNotFoundException("Invalid student id!");
         }
 
+        int noOfBooksNeedToReturn= isAllBooksReturned(studId);
+        if(noOfBooksNeedToReturn!=0){
+            throw new Exception("You haven't returned " +noOfBooksNeedToReturn+ " books. You must have to return first!");
+        }
+
+        studentRepository.delete(student);
+
+        return "Student removed successfully";
+    }
+    private int isAllBooksReturned(int studId){
+        // Getting Card Object from the DB
+        LibraryCard card=studentRepository.findById(studId).get().getCard();
+
+        // Getting List of all issued books by the student
+        List<Book>issuedBooksList=card.getBooksIssued();
+
+        // When student either returned all issued books or not issued any book
+        return issuedBooksList.size();
     }
 
 

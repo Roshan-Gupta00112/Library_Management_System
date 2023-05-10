@@ -5,11 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @NoArgsConstructor
@@ -28,8 +26,7 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     private TransactionStatus transactionStatus;
 
-    @CreationTimestamp
-    private Date transactionDate;
+    private LocalDate transactionDate;
 
     private boolean isIssueOperation;   // It tells whether a student is issue or Return a book where true is for issue
 

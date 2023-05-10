@@ -1,12 +1,16 @@
 package com.backendMajorProject.librarymanagementsystem.Controller;
 
 import com.backendMajorProject.librarymanagementsystem.DTO.Request.IssueBookRequestDto;
+import com.backendMajorProject.librarymanagementsystem.DTO.Request.ReturnBookRequestDto;
 import com.backendMajorProject.librarymanagementsystem.DTO.Response.IssueBookResponseDto;
+import com.backendMajorProject.librarymanagementsystem.DTO.Response.TransactionResponseDto;
 import com.backendMajorProject.librarymanagementsystem.Service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/transaction")
@@ -28,9 +32,30 @@ public class TransactionController {
         return new ResponseEntity(issueBookResponseDto, HttpStatus.ACCEPTED);
     }
 
+    @PutMapping("/return")
+    public String returnBook(@RequestBody ReturnBookRequestDto returnBookRequestDto) throws Exception {
+
+        return transactionService.returnBook(returnBookRequestDto);
+    }
+
     @GetMapping("/all-successful-transaction")
     public String getAllSuccessfulTxns(@RequestParam("cardId") int cardID){
 
         return transactionService.getAllSuccessfulTxns(cardID);
+    }
+
+    @GetMapping("/all-failed-transaction")
+    public String getAllFailedTxns(@RequestParam("id") int cardId){
+        return transactionService.getAllFailedTxns(cardId);
+    }
+
+    @GetMapping("/successful-transaction-for-issue-book")
+    public List<TransactionResponseDto> getAllSuccessTransactionForIssueBook(@RequestParam("id") int cardId){
+        return transactionService.getAllSuccessTransactionForIssueBook(cardId);
+    }
+
+    @GetMapping("/successful-transaction-for-return-book")
+    public List<TransactionResponseDto> getAllSuccessTransactionForReturnBook(@RequestParam("id") int cardId){
+        return transactionService.getAllSuccessTransactionForReturnBook(cardId);
     }
 }

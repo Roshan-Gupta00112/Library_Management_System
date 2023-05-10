@@ -1,28 +1,25 @@
 package com.backendMajorProject.librarymanagementsystem.DTO.Response;
 
-import com.backendMajorProject.librarymanagementsystem.Enum.Genre;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter
 @Getter
-public class BookResponseDto {
+public class ReturnedBookResponseDto {
 
-    private int id;
+    private String transactionNumber;
 
-    private String title;
+    private LocalDate issuedDate;
 
-    private int numberOfPages;
+    private int bookId;
 
-    private int quantity;
-
-    private Genre genre;
+    private String bookName;
 
     private String authorName;
-
-    private int price;
 }
