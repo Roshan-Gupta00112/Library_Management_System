@@ -33,9 +33,16 @@ public class TransactionController {
     }
 
     @PutMapping("/return")
-    public String returnBook(@RequestBody ReturnBookRequestDto returnBookRequestDto) throws Exception {
+    public ResponseEntity returnBook(@RequestBody ReturnBookRequestDto returnBookRequestDto) {
+        String str="";
+        try {
+            str=transactionService.returnBook(returnBookRequestDto);
+        }
+        catch (Exception e){
+            return new ResponseEntity(e.getMessage(), HttpStatus.NOT_ACCEPTABLE);
+        }
 
-        return transactionService.returnBook(returnBookRequestDto);
+        return new ResponseEntity(str, HttpStatus.ACCEPTED);
     }
 
     @GetMapping("/all-successful-transaction")

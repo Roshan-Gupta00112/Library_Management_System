@@ -3,6 +3,7 @@ package com.backendMajorProject.librarymanagementsystem.Controller;
 import com.backendMajorProject.librarymanagementsystem.DTO.Request.BookRequestDto;
 import com.backendMajorProject.librarymanagementsystem.DTO.Request.BookCountRequestDto;
 import com.backendMajorProject.librarymanagementsystem.DTO.Response.BookResponseDto;
+import com.backendMajorProject.librarymanagementsystem.DTO.Response.BookTransactionDetailsResponseDto;
 import com.backendMajorProject.librarymanagementsystem.Service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -88,6 +89,12 @@ public class BookController {
     public List<BookResponseDto> booksWithMaximumQuantity(){
         return bookService.booksWithMaximumQuantity();
     }
+
+    @GetMapping("/transaction-details-of-book")
+    public List<BookTransactionDetailsResponseDto> bookTransactionDetails(@RequestParam("id") int bookId){
+        return bookService.bookTransactionDetails(bookId);
+    }
+
 
 
     @DeleteMapping("/delete-all-the-counts-of-particular-book")

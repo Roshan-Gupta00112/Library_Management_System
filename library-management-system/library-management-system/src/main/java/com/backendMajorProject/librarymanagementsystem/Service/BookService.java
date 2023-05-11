@@ -3,8 +3,10 @@ package com.backendMajorProject.librarymanagementsystem.Service;
 import com.backendMajorProject.librarymanagementsystem.DTO.Request.BookRequestDto;
 import com.backendMajorProject.librarymanagementsystem.DTO.Request.BookCountRequestDto;
 import com.backendMajorProject.librarymanagementsystem.DTO.Response.BookResponseDto;
+import com.backendMajorProject.librarymanagementsystem.DTO.Response.BookTransactionDetailsResponseDto;
 import com.backendMajorProject.librarymanagementsystem.Entity.Author;
 import com.backendMajorProject.librarymanagementsystem.Entity.Book;
+import com.backendMajorProject.librarymanagementsystem.Entity.Transaction;
 import com.backendMajorProject.librarymanagementsystem.Repository.AuthorRepository;
 import com.backendMajorProject.librarymanagementsystem.Repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -349,6 +351,26 @@ public class BookService {
         }
 
         return bookResponseDtoList;
+    }
+
+
+    public List<BookTransactionDetailsResponseDto> bookTransactionDetails(int bookId){
+        // Getting Book Object from the DB
+        Book book=bookRepository.findById(bookId).get();
+
+        // Getting List of Transaction of Book
+        List<Transaction> transactionList=book.getTransactionList();
+
+        List<BookTransactionDetailsResponseDto> bookTransactionDetailsResponseDtoList =new ArrayList<>();
+
+        for (Transaction t:transactionList){
+            BookTransactionDetailsResponseDto bookTransactionDetailsResponseDto =new BookTransactionDetailsResponseDto(t.getTransactionNumber(),
+                    t.getTransactionDate(), t.isIssueOperation(), t.getTransactionStatus());
+
+            bookTransactionDetailsResponseDtoList.add(bookTransactionDetailsResponseDto);
+        }
+
+        return bookTransactionDetailsResponseDtoList;
     }
 
     public String removeParticularBooksFromLibrary(int bookId){

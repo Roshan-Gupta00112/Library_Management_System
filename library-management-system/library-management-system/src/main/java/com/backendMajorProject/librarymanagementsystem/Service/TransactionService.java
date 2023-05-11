@@ -155,21 +155,49 @@ public class TransactionService {
     // Returning A BOOK
     public String returnBook(ReturnBookRequestDto returnBookRequestDto) throws Exception{
 
-        // 1st Step:- Checking Fine
-        if(isFine(returnBookRequestDto.getTransactionNumber())){
-            int fine=calculateFine(returnBookRequestDto.getTransactionNumber());
-            throw new Exception("Your have to pay fine of rs" +fine+ " first!");
-        }
-
-        // 2nd Step:- Creating Transaction Object
+        // 1st Step:- Creating Transaction Object
         Transaction transaction=new Transaction();
         transaction.setTransactionNumber(String.valueOf(UUID.randomUUID()));
         transaction.setTransactionDate(LocalDate.now());
-        transaction.setIssueOperation(false);  // Bcoz here we are returning a book
+        transaction.setIssueOperation(false);  // Because here we are returning a book
 
 
+        // 2nd Step:- Checking validity of Transaction Number
+        Transaction txn= transactionRepository.findByTransactionNumber(returnBookRequestDto.getTransactionNumber());
+        if (txn==null){
+            transaction.setTransactionStatus(TransactionStatus.FAILED);
+            transaction.setMessage("Invalid transaction number!");
+            transactionRepository.save(transaction);
+            throw new Exception("Invalid transaction number!");
+        }
+        // Now, Transaction Number is valid. Now have to check Fine
 
-        // 3rd Step:- Checking Card Validity
+        // 3rd Step:- Checking Fine
+        if(isFine(txn.getTransactionNumber())){
+            int fine=calculateFine(returnBookRequestDto.getTransactionNumber());
+            transaction.setTransactionStatus(TransactionStatus.FAILED);
+            transaction.setMessage("Book has not been returned on time need to pay fine first!");
+            transactionRepository.save(transaction);
+            throw new Exception("Your have to pay fine of rs" +fine+ " first!");
+        }
+
+
+        // 4th Step:- Checking BooK id
+        Book returnBook;
+        try {
+            returnBook=bookRepository.findById(returnBookRequestDto.getBookId()).get();
+        }
+        catch (Exception e){
+            transaction.setTransactionStatus(TransactionStatus.FAILED);
+            transaction.setMessage("Invalid Book Id");
+            transactionRepository.save(transaction);
+            throw new Exception("Invalid Book Id");
+        }
+        // Now Book is Valid
+        transaction.setBook(returnBook);
+
+
+        // 5th Step:- Checking Card id
         LibraryCard card;
         try {
             card=cardRepository.findById(returnBookRequestDto.getCardId()).get();
@@ -184,53 +212,45 @@ public class TransactionService {
         transaction.setLibraryCard(card);
 
 
-        // 3rd Step:- Checking BooK Id
-        Book book;
-        try {
-            book=bookRepository.findById(returnBookRequestDto.getBookId()).get();
-        }
-        catch (Exception e){
-            transaction.setTransactionStatus(TransactionStatus.FAILED);
-            transaction.setMessage("Invalid Book Id");
-            throw new Exception("Invalid Book Id");
-        }
-        // Now Book is Valid
 
 
-        // Now we can return the book Successfully which means increasing the Book quantity by 1
-        book.setQuantity(book.getQuantity()+1);
-        book.setLibraryCard(null);  // because it's return book
+        // 6th Step:- Now we can return the book Successfully which means increasing the Book quantity by 1
+        returnBook.setQuantity(returnBook.getQuantity()+1);
 
-        // 4th Step:- Setting the Parameters of Transaction
+
+        // 7th Step:- Setting the Parameters of Transaction
         transaction.setTransactionStatus(TransactionStatus.SUCCESS);
         transaction.setMessage("Transaction was successful and you have successfully returned the book");
-        transaction.setBook(book);
+        transactionRepository.save(transaction);
 
-        // 5th Step:- Setting Parameters of Book
-        book.setLibraryCard(card);
-        List<Transaction> transactionList=book.getTransactionList();
-        transactionList.add(transaction);
-        book.setTransactionList(transactionList);
+        // 8th Step:- Setting Parameters of Book
+        List<Transaction> returnBookTransactionSDetail=returnBook.getTransactionList();
+        returnBookTransactionSDetail.add(transaction);
+        returnBook.setTransactionList(returnBookTransactionSDetail);
+        returnBook.setLibraryCard(null);  // because it's return book
+        bookRepository.save(returnBook);
 
-        // 6th Step:- Setting Parameters of Card
-        List<Transaction> transactions=card.getTransactionList();
-        transactions.add(transaction);
-        card.setTransactionList(transactions);
+        // 9th Step:- Setting Parameters of Card
+        List<Transaction> transactionDoneByCard=card.getTransactionList();
+        transactionDoneByCard.add(transaction);
+        card.setTransactionList(transactionDoneByCard);
         List<Book> books=card.getBooksIssued();
         for (Book b:books){
-            if(b.getId()==book.getId()){
+            if(b.getId()==returnBook.getId()){
                 books.remove(b);
             }
         }
-
-
-        // Now Saving the changes in DB
-        // Since Card is the Parent class of Both Transaction and Book class. So saving Card in the Db will save
-        // Transaction and Book Object in the Db bcoz of CASCADE Operation
+        card.setBooksIssued(books);
         cardRepository.save(card);
 
 
-        return "You have successfully returned "  +book.getTitle()+ " book";
+//        // 10th step:- Now Saving the changes in DB
+//        // Since Card is the Parent class of Both Transaction and Book class. So saving Card in the Db will save
+//        // Transaction and Book Object in the Db bcoz of CASCADE Operation
+//        cardRepository.save(card);
+
+
+        return "You have successfully returned "  +returnBook.getTitle()+ " book";
 
 
     }
